@@ -31,9 +31,6 @@ npm install
 # Ensure DATABASE_URL points to your PostgreSQL database
 cp .env.example .env
 
-# 4. Seed the database with default users and roles (run once)
-npm run seed
-
 # 5. Start the backend in development mode
 npm run start:dev
 ```

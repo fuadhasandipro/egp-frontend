@@ -15,14 +15,62 @@ export const Sidebar: React.FC = () => {
       <ul className="space-y-1">
         <li>
           <Link
-            href="/dashboard"
+            href="/"
             className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/dashboard'
+              pathname === '/'
                 ? 'bg-blue-50 text-blue-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
           >
             Dashboard
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/profile"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/profile'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Profile
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/admin/officers"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/admin/officers'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Create Officer
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/admin/users"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/admin/users'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Users List
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/institutions"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/institutions'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Institutions
           </Link>
         </li>
       </ul>
