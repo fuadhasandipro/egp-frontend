@@ -1,14 +1,25 @@
 'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from 'recharts';
 import { useAuth } from '@/context/AuthContext';
 import { inspectionsService } from '@/services/inspections.service';
 import { extractErrorMessage } from '@/lib/utils';
-import { StudentStatistic } from '@/types';
+import { StudentStatistic, InstitutionRef } from '@/types';
 
 export default function StudentStatsPage() {
   const { role } = useAuth();
   const [stats, setStats] = useState<StudentStatistic[]>([]);
+  const [institutions, setInstitutions] = useState<InstitutionRef[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
@@ -46,6 +57,13 @@ export default function StudentStatsPage() {
   useEffect(() => {
     fetchStats();
   }, [fetchStats]);
+
+  useEffect(() => {
+    inspectionsService
+      .findInstitutionOptions()
+      .then(setInstitutions)
+      .catch(() => setInstitutions([]));
+  }, []);
 
   const handleCreateStat = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,8 +139,43 @@ export default function StudentStatsPage() {
     }
   };
 
+  const totalBoysAll = stats.reduce((sum, s) => sum + s.totalBoys, 0);
+  const totalGirlsAll = stats.reduce((sum, s) => sum + s.totalGirls, 0);
+  const grandTotal = totalBoysAll + totalGirlsAll;
+  const girlsPercent = grandTotal ? Math.round((totalGirlsAll / grandTotal) * 100) : 0;
+
+  const chartData = stats.map((s) => ({
+    name: `${(s.institution?.name || 'Unknown').slice(0, 12)} ${s.academicYear}`,
+    Boys: s.totalBoys,
+    Girls: s.totalGirls,
+  }));
+
   return (
-    <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 space-y-6">
+    <div className="space-y-6">
+      {/* Summary cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Students</p>
+          <p className="text-3xl font-bold text-gray-800 mt-1">{grandTotal}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Boys</p>
+          <p className="text-3xl font-bold text-blue-600 mt-1">{totalBoysAll}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Girls</p>
+          <p className="text-3xl font-bold text-pink-600 mt-1">{totalGirlsAll}</p>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Girls Share</p>
+          <p className="text-3xl font-bold text-gray-800 mt-1">{girlsPercent}%</p>
+          <div className="mt-2 h-2 bg-blue-100 rounded-full overflow-hidden">
+            <div className="h-full bg-pink-500" style={{ width: `${girlsPercent}%` }} />
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-6 space-y-6">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b pb-4">
         <div>
@@ -159,15 +212,21 @@ export default function StudentStatsPage() {
           <h3 className="text-base font-semibold text-gray-800 border-b pb-2">Add Student Statistic</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Institution ID</label>
-              <input
-                type="text"
+              <label className="block text-sm font-medium text-gray-700 mb-1">Institution</label>
+              <select
                 required
                 value={institutionId}
                 onChange={(e) => setInstitutionId(e.target.value)}
-                placeholder="Institution UUID"
                 className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
+              >
+                <option value="">Select an institution</option>
+                {institutions.map((inst) => (
+                  <option key={inst.id} value={inst.id}>
+                    {inst.name}
+                    {inst.eiin ? ` (EIIN ${inst.eiin})` : ''}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
@@ -220,6 +279,24 @@ export default function StudentStatsPage() {
             </button>
           </div>
         </form>
+      )}
+
+      {/* Chart */}
+      {!loading && stats.length > 0 && (
+        <div className="border border-gray-200 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-gray-700 mb-3">Enrollment by Institution & Year</h3>
+          <ResponsiveContainer width="100%" height={240}>
+            <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+              <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
+              <YAxis tick={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
+              <Bar dataKey="Boys" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Girls" fill="#ec4899" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       )}
 
       {/* Table */}
@@ -341,6 +418,7 @@ export default function StudentStatsPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

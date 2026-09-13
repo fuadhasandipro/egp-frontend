@@ -1,6 +1,7 @@
 import apiClient from '@/lib/axios';
 import {
   ApiResponse,
+  InstitutionRef,
   Inspection,
   CreateInspectionDto,
   QueryInspectionDto,
@@ -13,6 +14,17 @@ import {
 } from '@/types';
 
 export const inspectionsService = {
+  // ---------------------------------------------------------------
+  // INSTITUTIONS (for select dropdowns)
+  // ---------------------------------------------------------------
+  async findInstitutionOptions(): Promise<InstitutionRef[]> {
+    const res = await apiClient.get<ApiResponse<{ items: InstitutionRef[] }>>('/api/institutions', {
+      params: { limit: 100 },
+    });
+    const data = res.data?.data || (res.data as any);
+    return data?.items || [];
+  },
+
   // ---------------------------------------------------------------
   // INSPECTIONS
   // ---------------------------------------------------------------
