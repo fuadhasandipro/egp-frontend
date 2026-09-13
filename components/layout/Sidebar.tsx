@@ -73,6 +73,45 @@ export const Sidebar: React.FC = () => {
             Institutions
           </Link>
         </li>
+        <li className="pt-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Tickets & Assets
+        </li>
+        <li>
+          <Link
+            href="/complaints"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/complaints'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Complaints
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/assets"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/assets'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            School Assets
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/infrastructure"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/infrastructure'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Infra Requests
+          </Link>
+        </li>
       </ul>
     </aside>
   );
