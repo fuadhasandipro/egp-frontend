@@ -189,7 +189,6 @@ export default function InspectionsPage() {
                 <th className="p-3">Score</th>
                 <th className="p-3">Notes</th>
                 <th className="p-3">Inspector</th>
-                <th className="p-3">Date</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
@@ -207,9 +206,6 @@ export default function InspectionsPage() {
                     {i.notes || '—'}
                   </td>
                   <td className="p-3 text-gray-600">{i.inspector?.email || i.inspectorId}</td>
-                  <td className="p-3 text-gray-500 text-xs">
-                    {i.createdAt ? new Date(i.createdAt).toLocaleDateString() : 'N/A'}
-                  </td>
                 </tr>
               ))}
             </tbody>

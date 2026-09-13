@@ -11,8 +11,6 @@ export interface Inspection {
   inspectorId: string;
   score: number;
   notes?: string;
-  createdAt: string;
-  updatedAt: string;
   institution?: InstitutionRef;
   inspector?: UserRef;
 }
