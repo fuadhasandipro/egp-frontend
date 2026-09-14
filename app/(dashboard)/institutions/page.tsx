@@ -74,7 +74,7 @@ export default function InstitutionsPage() {
           {isCreating ? 'Cancel' : 'Add Institution'}
         </button>
       </div>
-      
+
       {error && (
         <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-200 rounded text-sm">
           {error}
@@ -144,7 +144,7 @@ export default function InstitutionsPage() {
                   <td className="px-4 py-3">{inst.eiin}</td>
                   <td className="px-4 py-3">{inst.type}</td>
                   <td className="px-4 py-3 text-xs">
-                    Lat: {inst.latitude}<br/>Lng: {inst.longitude}
+                    Lat: {inst.latitude}<br />Lng: {inst.longitude}
                   </td>
                 </tr>
               ))

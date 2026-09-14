@@ -3,9 +3,17 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
+  const { role } = useAuth();
+
+
+  const canAccess = (allowedRoles: string[]) => {
+    if (!role) return false;
+    return allowedRoles.includes(role);
+  };
 
   return (
     <aside className="w-56 bg-white border-r border-gray-200 p-4 min-h-screen shrink-0">
@@ -15,9 +23,9 @@ export const Sidebar: React.FC = () => {
       <ul className="space-y-1">
         <li>
           <Link
-            href="/"
+            href="/dashboard"
             className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/'
+              pathname === '/dashboard' || pathname === '/'
                 ? 'bg-blue-50 text-blue-700 font-semibold'
                 : 'text-gray-700 hover:bg-gray-100'
             }`}
@@ -37,120 +45,147 @@ export const Sidebar: React.FC = () => {
             Profile
           </Link>
         </li>
-        <li>
-          <Link
-            href="/admin/officers"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/admin/officers'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Create Officer
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/admin/users"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/admin/users'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Users List
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/institutions"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/institutions'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Institutions
-          </Link>
-        </li>
+
+        {canAccess(['admin']) && (
+          <>
+            <li>
+              <Link
+                href="/admin/officers"
+                className={`block px-3 py-2 rounded text-sm ${
+                  pathname === '/admin/officers'
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Create Officer
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/admin/users"
+                className={`block px-3 py-2 rounded text-sm ${
+                  pathname === '/admin/users'
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Users List
+              </Link>
+            </li>
+          </>
+        )}
+
+        {canAccess(['admin', 'officer', 'head_teacher']) && (
+          <li>
+            <Link
+              href="/institutions"
+              className={`block px-3 py-2 rounded text-sm ${
+                pathname === '/institutions'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Institutions
+            </Link>
+          </li>
+        )}
+
         <li className="pt-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           Tickets & Assets
         </li>
-        <li>
-          <Link
-            href="/complaints"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/complaints'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Complaints
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/assets"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/assets'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            School Assets
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/infrastructure"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/infrastructure'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Infra Requests
-          </Link>
-        </li>
+        
+        {canAccess(['admin', 'officer', 'head_teacher', 'teacher']) && (
+          <li>
+            <Link
+              href="/complaints"
+              className={`block px-3 py-2 rounded text-sm ${
+                pathname === '/complaints'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Complaints
+            </Link>
+          </li>
+        )}
+
+        {canAccess(['admin', 'officer', 'head_teacher']) && (
+          <>
+            <li>
+              <Link
+                href="/assets"
+                className={`block px-3 py-2 rounded text-sm ${
+                  pathname === '/assets'
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                School Assets
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/infrastructure"
+                className={`block px-3 py-2 rounded text-sm ${
+                  pathname === '/infrastructure'
+                    ? 'bg-blue-50 text-blue-700 font-semibold'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                Infra Requests
+              </Link>
+            </li>
+          </>
+        )}
+
         <li className="pt-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           Inspections & Academics
         </li>
-        <li>
-          <Link
-            href="/inspections"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/inspections'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Inspections
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/student-stats"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/student-stats'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Student Stats
-          </Link>
-        </li>
-        <li>
-          <Link
-            href="/training"
-            className={`block px-3 py-2 rounded text-sm ${
-              pathname === '/training'
-                ? 'bg-blue-50 text-blue-700 font-semibold'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            Training
-          </Link>
-        </li>
+
+        {canAccess(['admin', 'officer', 'head_teacher']) && (
+          <li>
+            <Link
+              href="/inspections"
+              className={`block px-3 py-2 rounded text-sm ${
+                pathname === '/inspections'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Inspections
+            </Link>
+          </li>
+        )}
+
+        {canAccess(['admin', 'head_teacher']) && (
+          <li>
+            <Link
+              href="/student-stats"
+              className={`block px-3 py-2 rounded text-sm ${
+                pathname === '/student-stats'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Student Stats
+            </Link>
+          </li>
+        )}
+
+        {canAccess(['admin', 'officer', 'teacher']) && (
+          <li>
+            <Link
+              href="/training"
+              className={`block px-3 py-2 rounded text-sm ${
+                pathname === '/training'
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
+            >
+              Training
+            </Link>
+          </li>
+        )}
       </ul>
     </aside>
   );
