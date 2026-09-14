@@ -11,6 +11,9 @@ import {
   UpdateStudentStatDto,
   AssignTrainingDto,
   TeacherTraining,
+  TrainingProgram,
+  CreateTrainingProgramDto,
+  TeacherOption,
 } from '@/types';
 
 export const inspectionsService = {
@@ -71,6 +74,26 @@ export const inspectionsService = {
   // ---------------------------------------------------------------
   // TRAINING
   // ---------------------------------------------------------------
+  async findTrainingPrograms(): Promise<TrainingProgram[]> {
+    const res = await apiClient.get<ApiResponse<TrainingProgram[]>>('/api/training/programs');
+    return res.data?.data || (res.data as any);
+  },
+
+  async findTeacherOptions(): Promise<TeacherOption[]> {
+    const res = await apiClient.get<ApiResponse<TeacherOption[]>>('/api/training/teachers');
+    return res.data?.data || (res.data as any);
+  },
+
+  async findTrainingRecords(): Promise<TeacherTraining[]> {
+    const res = await apiClient.get<ApiResponse<TeacherTraining[]>>('/api/training/records');
+    return res.data?.data || (res.data as any);
+  },
+
+  async createTrainingProgram(dto: CreateTrainingProgramDto): Promise<TrainingProgram> {
+    const res = await apiClient.post<ApiResponse<TrainingProgram>>('/api/training/programs', dto);
+    return res.data?.data || (res.data as any);
+  },
+
   async assignTraining(dto: AssignTrainingDto): Promise<TeacherTraining> {
     const res = await apiClient.post<ApiResponse<TeacherTraining>>('/api/training/assign', dto);
     return res.data?.data || (res.data as any);
