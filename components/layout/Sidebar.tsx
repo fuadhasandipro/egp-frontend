@@ -112,6 +112,45 @@ export const Sidebar: React.FC = () => {
             Infra Requests
           </Link>
         </li>
+        <li className="pt-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+          Inspections & Academics
+        </li>
+        <li>
+          <Link
+            href="/inspections"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/inspections'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Inspections
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/student-stats"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/student-stats'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Student Stats
+          </Link>
+        </li>
+        <li>
+          <Link
+            href="/training"
+            className={`block px-3 py-2 rounded text-sm ${
+              pathname === '/training'
+                ? 'bg-blue-50 text-blue-700 font-semibold'
+                : 'text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            Training
+          </Link>
+        </li>
       </ul>
     </aside>
   );
