@@ -5,6 +5,7 @@ import { useAuth } from '@/context/AuthContext';
 import { inspectionsService } from '@/services/inspections.service';
 import { extractErrorMessage } from '@/lib/utils';
 import { TeacherOption, TeacherTraining, TrainingProgram } from '@/types';
+import CountUp from '@/components/ui/CountUp';
 
 /** The API returns `profile: null` for the seeded users, so email is the reliable label. */
 function teacherLabel(teacher: TeacherOption): string {
@@ -111,17 +112,32 @@ export default function TrainingPage() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-5">
+        <div
+          className="bg-white shadow-sm rounded-lg border border-gray-200 p-5 egp-card egp-rise"
+          style={{ '--delay': '0ms' } as React.CSSProperties}
+        >
           <p className="text-sm text-gray-500">Training Programs</p>
-          <p className="text-3xl font-bold text-blue-600">{summary.programs}</p>
+          <p className="text-3xl font-bold text-blue-600">
+            <CountUp value={summary.programs} />
+          </p>
         </div>
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-5">
+        <div
+          className="bg-white shadow-sm rounded-lg border border-gray-200 p-5 egp-card egp-rise"
+          style={{ '--delay': '80ms' } as React.CSSProperties}
+        >
           <p className="text-sm text-gray-500">Trainings Completed</p>
-          <p className="text-3xl font-bold text-emerald-600">{summary.records}</p>
+          <p className="text-3xl font-bold text-emerald-600">
+            <CountUp value={summary.records} />
+          </p>
         </div>
-        <div className="bg-white shadow-sm rounded-lg border border-gray-200 p-5">
+        <div
+          className="bg-white shadow-sm rounded-lg border border-gray-200 p-5 egp-card egp-rise"
+          style={{ '--delay': '160ms' } as React.CSSProperties}
+        >
           <p className="text-sm text-gray-500">Teachers Trained</p>
-          <p className="text-3xl font-bold text-amber-600">{summary.teachersTrained}</p>
+          <p className="text-3xl font-bold text-amber-600">
+            <CountUp value={summary.teachersTrained} />
+          </p>
         </div>
       </div>
 

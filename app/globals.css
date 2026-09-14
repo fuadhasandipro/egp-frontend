@@ -3,3 +3,51 @@
 body {
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ---------------------------------------------------------------
+   Entrance animations for summary cards and chart panels.
+   Each card sets its own --delay so a row staggers in sequence.
+   --------------------------------------------------------------- */
+@keyframes egp-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.egp-rise {
+  opacity: 0;
+  animation: egp-rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation-delay: var(--delay, 0ms);
+}
+
+/* Progress bars and score meters grow to their final width. */
+.egp-grow {
+  transition: width 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* A card lifts slightly on hover so the row feels responsive. */
+.egp-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.egp-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px -12px rgb(0 0 0 / 0.25);
+}
+
+/* Respect users who ask the OS for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .egp-rise,
+  .egp-grow,
+  .egp-card {
+    animation: none;
+    transition: none;
+    opacity: 1;
+    transform: none;
+  }
+}

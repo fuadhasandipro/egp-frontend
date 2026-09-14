@@ -15,8 +15,37 @@ import { useAuth } from '@/context/AuthContext';
 import { inspectionsService } from '@/services/inspections.service';
 import { extractErrorMessage } from '@/lib/utils';
 import { Inspection, InstitutionRef } from '@/types';
+import CountUp from '@/components/ui/CountUp';
 
 const scoreColor = (s: number) => (s >= 80 ? '#10b981' : s >= 50 ? '#f59e0b' : '#ef4444');
+
+/** Gradient definitions, one per score band, rendered once inside <defs>. */
+const BAND_GRADIENTS = [
+  { id: 'egpScoreGood', color: '#10b981' },
+  { id: 'egpScoreAvg', color: '#f59e0b' },
+  { id: 'egpScorePoor', color: '#ef4444' },
+];
+
+const gradientId = (s: number) =>
+  s >= 80 ? 'egpScoreGood' : s >= 50 ? 'egpScoreAvg' : 'egpScorePoor';
+
+const scoreLabel = (s: number) => (s >= 80 ? 'Good' : s >= 50 ? 'Average' : 'Poor');
+
+/** Replaces the default tooltip so the score carries its band colour and label. */
+function ScoreTooltip({ active, payload, label }: any) {
+  if (!active || !payload?.length) return null;
+  const score = payload[0].value as number;
+  return (
+    <div className="bg-white border border-gray-200 rounded-md shadow-lg px-3 py-2 text-xs">
+      <p className="font-medium text-gray-700 mb-1">{label}</p>
+      <p className="flex items-center gap-1.5">
+        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: scoreColor(score) }} />
+        <span className="font-bold" style={{ color: scoreColor(score) }}>{score}</span>
+        <span className="text-gray-500">/ 100 · {scoreLabel(score)}</span>
+      </p>
+    </div>
+  );
+}
 
 export default function InspectionsPage() {
   const { role } = useAuth();
@@ -129,21 +158,39 @@ export default function InspectionsPage() {
     <div className="space-y-6">
       {/* Summary cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+        <div
+          className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm egp-card egp-rise"
+          style={{ '--delay': '0ms' } as React.CSSProperties}
+        >
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Total Inspections</p>
-          <p className="text-3xl font-bold text-gray-800 mt-1">{total}</p>
+          <p className="text-3xl font-bold text-gray-800 mt-1">
+            <CountUp value={total} />
+          </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+        <div
+          className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm egp-card egp-rise"
+          style={{ '--delay': '80ms' } as React.CSSProperties}
+        >
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Average Score</p>
           <p className="text-3xl font-bold mt-1" style={{ color: scoreColor(averageScore) }}>
-            {averageScore}
+            <CountUp value={averageScore} />
           </p>
-          <p className="text-xs text-gray-400">on this page</p>
+          {/* Meter grows to the average so the number has a visual anchor. */}
+          <div className="mt-2 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full rounded-full egp-grow"
+              style={{ width: `${averageScore}%`, backgroundColor: scoreColor(averageScore) }}
+            />
+          </div>
+          <p className="text-xs text-gray-400 mt-1">on this page</p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+        <div
+          className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm egp-card egp-rise"
+          style={{ '--delay': '160ms' } as React.CSSProperties}
+        >
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Passing (≥50)</p>
           <p className="text-3xl font-bold text-gray-800 mt-1">
-            {passing}
+            <CountUp value={passing} />
             <span className="text-base font-normal text-gray-400"> / {inspections.length}</span>
           </p>
         </div>
@@ -251,17 +298,50 @@ export default function InspectionsPage() {
 
         {/* Chart */}
         {!loading && inspections.length > 0 && (
-          <div className="border border-gray-200 rounded-lg p-4">
-            <h3 className="text-sm font-semibold text-gray-700 mb-3">Score Distribution</h3>
-            <ResponsiveContainer width="100%" height={220}>
+          <div className="border border-gray-200 rounded-lg p-4 egp-rise" style={{ '--delay': '260ms' } as React.CSSProperties}>
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-gray-700">Score Distribution</h3>
+              <div className="flex items-center gap-3 text-[10px] text-gray-500">
+                {[
+                  { label: 'Good (≥80)', color: '#10b981' },
+                  { label: 'Average (≥50)', color: '#f59e0b' },
+                  { label: 'Poor (<50)', color: '#ef4444' },
+                ].map((band) => (
+                  <span key={band.label} className="flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full" style={{ backgroundColor: band.color }} />
+                    {band.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+            <ResponsiveContainer width="100%" height={240}>
               <BarChart data={chartData} margin={{ top: 5, right: 10, left: -20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                {/* One vertical gradient per score band, referenced by the Cells below. */}
+                <defs>
+                  {BAND_GRADIENTS.map((band) => (
+                    <linearGradient key={band.id} id={band.id} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={band.color} stopOpacity={0.95} />
+                      <stop offset="100%" stopColor={band.color} stopOpacity={0.45} />
+                    </linearGradient>
+                  ))}
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} interval={0} angle={-20} textAnchor="end" height={60} />
                 <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                <Tooltip contentStyle={{ fontSize: 12, borderRadius: 6 }} />
-                <Bar dataKey="score" radius={[4, 4, 0, 0]}>
+                <Tooltip
+                  cursor={{ fill: 'rgba(59, 130, 246, 0.06)' }}
+                  content={<ScoreTooltip />}
+                />
+                <Bar
+                  dataKey="score"
+                  radius={[6, 6, 0, 0]}
+                  isAnimationActive
+                  animationBegin={200}
+                  animationDuration={900}
+                  animationEasing="ease-out"
+                >
                   {chartData.map((entry, idx) => (
-                    <Cell key={idx} fill={scoreColor(entry.score)} />
+                    <Cell key={idx} fill={`url(#${gradientId(entry.score)})`} />
                   ))}
                 </Bar>
               </BarChart>
