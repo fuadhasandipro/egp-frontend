@@ -76,4 +76,26 @@ export interface TeacherTraining {
   trainingId: string;
   completionDate: string;
   createdAt: string;
+  user?: UserRef;
+  training?: TrainingProgram;
+}
+
+export interface TrainingProgram {
+  id: string;
+  title: string;
+  duration: string;
+  organizer: string;
+}
+
+export interface CreateTrainingProgramDto {
+  title: string;
+  duration: string;
+  organizer: string;
+}
+
+/** Teacher option for the assign dropdown. `profile` is null for the seeded users. */
+export interface TeacherOption {
+  id: string;
+  email: string;
+  profile?: { fullName?: string } | null;
 }
