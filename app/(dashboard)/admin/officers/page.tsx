@@ -1,16 +1,34 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import apiClient from '@/lib/axios';
 
 export default function CreateOfficerPage() {
   const [email, setEmail] = useState('');
-  const [roleName, setRoleName] = useState('to'); // default to 'to' (Thana Education Officer)
+  const [roleName, setRoleName] = useState('to');
   const [institutionId, setInstitutionId] = useState('');
-  
+  const [institutions, setInstitutions] = useState<any[]>([]);
+
   const [loading, setLoading] = useState(false);
+  const [loadingInstitutions, setLoadingInstitutions] = useState(true);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInstitutions = async () => {
+      try {
+        const response = await apiClient.get('/api/institutions', { params: { limit: 100 } });
+        const data = response.data?.data?.items || response.data?.data || [];
+        setInstitutions(data);
+      } catch (err) {
+        console.error('Failed to load institutions', err);
+      } finally {
+        setLoadingInstitutions(false);
+      }
+    };
+
+    fetchInstitutions();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +95,7 @@ export default function CreateOfficerPage() {
           <select
             value={roleName}
             onChange={(e) => setRoleName(e.target.value)}
-            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500"
+            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500 bg-white"
           >
             <option value="to">TO (Thana Education Officer)</option>
             <option value="ato">ATO (Assistant Thana Education Officer)</option>
@@ -86,16 +104,22 @@ export default function CreateOfficerPage() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Assign to Institution (Optional ID)
+            Assign to Institution (Optional)
           </label>
-          <input
-            type="text"
+          <select
             value={institutionId}
             onChange={(e) => setInstitutionId(e.target.value)}
-            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500"
-            placeholder="e.g. 123e4567-e89b-12d3-a456-426614174000"
-          />
-          <p className="text-xs text-gray-400 mt-1">Leave blank if the officer manages an entire region.</p>
+            disabled={loadingInstitutions}
+            className="w-full border border-gray-300 px-3 py-2 rounded text-sm focus:outline-none focus:border-blue-500 bg-white disabled:opacity-50"
+          >
+            <option value="">-- None (Manage Entire Region) --</option>
+            {institutions.map((inst) => (
+              <option key={inst.id} value={inst.id}>
+                {inst.name} ({inst.eiin})
+              </option>
+            ))}
+          </select>
+          <p className="text-xs text-gray-400 mt-1">Leave as "None" if the officer manages an entire region instead of a single school.</p>
         </div>
 
         <button
