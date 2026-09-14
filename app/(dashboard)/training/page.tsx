@@ -33,7 +33,7 @@ export default function TrainingPage() {
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const canAssign = role === 'admin' || role === 'officer';
+  const canAssign = role === 'admin' || role === 'to' || role === 'ato';
 
   const loadData = useCallback(async () => {
     setLoading(true);

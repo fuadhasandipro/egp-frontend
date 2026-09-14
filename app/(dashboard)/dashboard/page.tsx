@@ -19,14 +19,14 @@ import apiClient from '@/lib/axios';
 
 export default function DashboardPage() {
   const { user, role } = useAuth();
-  
+
   const [stats, setStats] = useState({
     institutions: 0,
     users: 0,
     inspections: 0,
     complaints: 0,
   });
-  
+
   const [chartAttendanceData, setChartAttendanceData] = useState<any[]>([]);
   const [chartComplaintsData, setChartComplaintsData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -53,33 +53,34 @@ export default function DashboardPage() {
 
         setStats({ institutions, users, inspections, complaints: complaintsCount });
 
-        // Fetch time-series / aggregation data for charts
-        try {
-          const attRes = await apiClient.get('/api/attendance', { params: { limit: 100 } });
-          const attendanceData = attRes.data?.data?.items || attRes.data?.data || [];
-          
-          const attByDate: Record<string, any> = {};
-          attendanceData.forEach((log: any) => {
-            const d = log.date;
-            if (!attByDate[d]) attByDate[d] = { name: d, present: 0, absent: 0, late: 0 };
-            if (log.status === 'Present') attByDate[d].present += 1;
-            else if (log.status === 'Absent') attByDate[d].absent += 1;
-            else if (log.status === 'Late') attByDate[d].late += 1;
-          });
-          
-          const sortedAtt = Object.values(attByDate)
-            .sort((a: any, b: any) => a.name.localeCompare(b.name))
-            .slice(-7);
-            
-          setChartAttendanceData(sortedAtt);
-        } catch (e) {
-          console.error("Failed to fetch attendance for charts", e);
+        if (role !== 'teacher') {
+          try {
+            const attRes = await apiClient.get('/api/attendance', { params: { limit: 100 } });
+            const attendanceData = attRes.data?.data?.items || attRes.data?.data || [];
+
+            const attByDate: Record<string, any> = {};
+            attendanceData.forEach((log: any) => {
+              const d = log.date;
+              if (!attByDate[d]) attByDate[d] = { name: d, present: 0, absent: 0, late: 0 };
+              if (log.status === 'Present') attByDate[d].present += 1;
+              else if (log.status === 'Absent') attByDate[d].absent += 1;
+              else if (log.status === 'Late') attByDate[d].late += 1;
+            });
+
+            const sortedAtt = Object.values(attByDate)
+              .sort((a: any, b: any) => a.name.localeCompare(b.name))
+              .slice(-7);
+
+            setChartAttendanceData(sortedAtt);
+          } catch (e) {
+            console.error("Failed to fetch attendance for charts", e);
+          }
         }
 
         try {
           const compRes = await apiClient.get('/api/tickets/complaints', { params: { limit: 100 } });
           const complaintsData = compRes.data?.data?.items || compRes.data?.data || [];
-          
+
           const compByStatus: Record<string, any> = { 'Open': 0, 'In Progress': 0, 'Resolved': 0 };
           complaintsData.forEach((c: any) => {
             if (compByStatus[c.status] !== undefined) {
@@ -88,7 +89,7 @@ export default function DashboardPage() {
               compByStatus[c.status] = 1;
             }
           });
-          
+
           setChartComplaintsData([
             { name: 'Open', count: compByStatus['Open'] || 0, fill: '#EF4444' },
             { name: 'In Progress', count: compByStatus['In Progress'] || 0, fill: '#F59E0B' },
@@ -146,7 +147,7 @@ export default function DashboardPage() {
               </>
             )}
 
-            {role === 'officer' && (
+            {(role === 'to' || role === 'ato') && (
               <>
                 <StatCard title="Schools in Region" value={stats.institutions} icon={Users} color="bg-blue-500" />
                 <StatCard title="Inspections" value={stats.inspections} icon={FileText} color="bg-yellow-500" />

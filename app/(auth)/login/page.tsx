@@ -14,9 +14,9 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   const testAccounts = [
-    { label: 'Admin (UNO)', email: 'uno@egp.gov' },
     { label: 'Admin', email: 'admin@egp.gov' },
-    { label: 'TO Officer', email: 'to@egp.gov' },
+    { label: 'TO (Officer)', email: 'to@egp.gov' },
+    { label: 'ATO (Asst. Officer)', email: 'ato@egp.gov' },
     { label: 'Head Teacher', email: 'headteacher@egp.gov' },
     { label: 'Teacher', email: 'teacher@egp.gov' },
   ];

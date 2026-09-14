@@ -75,7 +75,7 @@ export const Sidebar: React.FC = () => {
           </>
         )}
 
-        {canAccess(['admin', 'officer', 'head_teacher']) && (
+        {canAccess(['admin', 'to', 'ato', 'head_teacher']) && (
           <li>
             <Link
               href="/institutions"
@@ -94,7 +94,7 @@ export const Sidebar: React.FC = () => {
           Tickets & Assets
         </li>
         
-        {canAccess(['admin', 'officer', 'head_teacher', 'teacher']) && (
+        {canAccess(['admin', 'to', 'ato', 'head_teacher', 'teacher']) && (
           <li>
             <Link
               href="/complaints"
@@ -109,7 +109,7 @@ export const Sidebar: React.FC = () => {
           </li>
         )}
 
-        {canAccess(['admin', 'officer', 'head_teacher']) && (
+        {canAccess(['admin', 'to', 'ato', 'head_teacher']) && (
           <>
             <li>
               <Link
@@ -142,7 +142,7 @@ export const Sidebar: React.FC = () => {
           Inspections & Academics
         </li>
 
-        {canAccess(['admin', 'officer', 'head_teacher']) && (
+        {canAccess(['admin', 'to', 'ato', 'head_teacher']) && (
           <li>
             <Link
               href="/inspections"
@@ -172,7 +172,7 @@ export const Sidebar: React.FC = () => {
           </li>
         )}
 
-        {canAccess(['admin', 'officer', 'teacher']) && (
+        {canAccess(['admin', 'to', 'ato', 'teacher']) && (
           <li>
             <Link
               href="/training"

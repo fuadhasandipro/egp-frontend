@@ -39,7 +39,7 @@ export default function InspectionsPage() {
   const [notes, setNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const isOfficer = role === 'officer';
+  const isOfficer = role === 'to' || role === 'ato';
 
   const fetchInspections = useCallback(async () => {
     setLoading(true);
